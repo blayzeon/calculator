@@ -1,0 +1,36 @@
+body{
+  margin: 0;
+  padding: 0;
+}
+
+.container{
+  display:flex;
+  flex-direction: column;
+}
+
+#display{
+  background: gray;
+  height: 15rem;
+  color: white;
+}
+
+#controls{
+  background: black;
+  color: white;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+}
+
+#controls div{
+  padding: 2rem;
+  width: 7rem;
+  font-size: 3rem;
+}
+
+#controls div:hover{
+  background: grey;
+}
