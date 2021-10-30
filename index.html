@@ -16,7 +16,7 @@
                     <div>
                         <span class="gray-hover square">-</span>
                         <span class="gray-hover square">□</span>
-                        <span class="red-hover square">X</span>
+                        <span class="red-hover square">x</span>
                     </div>
                 </div>
                 <div id="second-bar">
@@ -27,48 +27,51 @@
                     </div>
                     <div class="large-font gray-hover">⟲</div>
                 </div>
-                <div id="equation-display">0</div>
-                    <div id="third-bar">
-                        <span class="gray-font">MC</span>
-                        <span class="gray-font">MR</span>
-                        <span class="gray-hover">M+</span>
-                        <span class="gray-hover">M-</span>
-                        <span class="gray-hover">MS</span>
-                        <span class="gray-font">M▾</span>
-                    </div>
+                <div id="main-display">
+                    <div id="history-display" class="gray-font"></div>
+                    <div id="equation-display">0</div>
+                </div>
+                <div id="third-bar">
+                    <span class="button gray-font">MC</span>
+                    <span class="button gray-font">MR</span>
+                    <span class="button gray-hover">M+</span>
+                    <span class="button gray-hover">M-</span>
+                    <span class="button gray-hover">MS</span>
+                    <span class="button gray-font">M▾</span>
+                </div>
             </div>
             <div id="controls">
                 <ul id="c1" class="column">
-                    <li class="light-gray-bg">%</li>
-                    <li class="light-gray-bg group-character"><span>1</span><span>/</span><span>x</span></li>
-                    <li>7</li>
-                    <li>4</li>
-                    <li>1</li>
-                    <li class="group-character"><span>+</span><span>/</span><span>-</span></li>
+                    <li class="button light-gray-bg" data-button="%" id="percent">%</li>
+                    <li class="button light-gray-bg group-character"><span>1</span><span>/</span><span>x</span></li>
+                    <li class="button num" data-button="7">7</li>
+                    <li class="button num" data-button="4">4</li>
+                    <li class="button num" data-button="1">1</li>
+                    <li class="button group-character"><span>+</span><span>/</span><span>-</span></li>
                 </ul>
                 <ul id="c2" class="column">
-                    <li class="light-gray-bg">CE</li>
-                    <li class="light-gray-bg">x²</li>
-                    <li>8</li>
-                    <li>5</li>
-                    <li>2</li>
-                    <li>0</li>
+                    <li class="button light-gray-bg button" data-button="ce" id="clear-entry">CE</li>
+                    <li class="button light-gray-bg">x²</li>
+                    <li class="button num" data-button="8">8</li>
+                    <li class="button num" data-button="5">5</li>
+                    <li class="button num" data-button="2">2</li>
+                    <li class="button num" data-button="0">0</li>
                 </ul>
                 <ul id="c3" class="column">
-                    <li class="light-gray-bg">C</li>
-                    <li class="light-gray-bg group-character"><span>2</span><span>√</span><span>x</span></li>
-                    <li>9</li>
-                    <li>6</li>
-                    <li>3</li>
-                    <li>.</li>
+                    <li class="button light-gray-bg button" data-button="c" id="clear">C</li>
+                    <li class="button light-gray-bg group-character"><span>2</span><span>√</span><span>x</span></li>
+                    <li class="button num" data-button="9">9</li>
+                    <li class="button num" data-button="6">6</li>
+                    <li class="button num" data-button="3">3</li>
+                    <li class="button" data-button="." id="decimal">.</li>
                 </ul>
                 <ul id="c4" class="column">
-                    <li class="light-gray-bg">⌫</li>
-                    <li class="light-gray-bg">÷</li>
-                    <li class="light-gray-bg">X</li>
-                    <li class="light-gray-bg">-</li>
-                    <li class="light-gray-bg">+</li>
-                    <li class="bluish-bg">=</li>
+                    <li class="button light-gray-bg" id="backspace" data-button="backspace">⌫</li>
+                    <li class="button light-gray-bg operator" data-button="/">÷</li>
+                    <li class="button light-gray-bg operator" data-button="*">X</li>
+                    <li class="button light-gray-bg operator" data-button="-">-</li>
+                    <li class="button light-gray-bg operator" data-button="+">+</li>
+                    <li class="button bluish-bg operator" data-button="=">=</li>
                 </ul>
             </div>
         </div>

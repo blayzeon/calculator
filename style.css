@@ -10,6 +10,7 @@ body{
   background-image: url('https://wallpapercave.com/wp/wp5493583.jpg');
   font-family: arial;
   font-weight: bold;
+  user-select: none;
 }
 
 /* END - UNIVERSAL / DEFAULT 
@@ -52,10 +53,23 @@ START - FLEX / CONTAINERS */
   gap: 0.8rem;
 }
 
-#equation-display{
-  padding: 2rem 0.2rem;
-  font-size: 3rem;
+#main-display{
+  padding: 0.5rem 0.2rem 2rem 0.2rem;
   text-align: right;
+}
+
+#history-display{
+  margin-bottom: 0.3rem;
+  min-height: 1.6rem;
+}
+
+#equation-display{
+  font-size: 3rem;
+  max-width: 19rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  user-select: text;
 }
 
 #third-bar{
@@ -80,8 +94,8 @@ START - FLEX / CONTAINERS */
 }
 
 .square{
-  width: 1rem;
-  padding: 0.5rem 1rem;
+  width: 1rem !important;
+  padding: 0.5rem 1rem !important;
   display: flex;
   justify-content: center;
   align-items: center;
