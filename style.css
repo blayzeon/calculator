@@ -90,7 +90,7 @@ START - FLEX / CONTAINERS */
   all: unset;
   list-style-type: none;
   width: 25%;
-  
+  line-height: 1.2rem;
 }
 
 .square{
