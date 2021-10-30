@@ -114,7 +114,7 @@ function keypadListeners(){
             }
         } else if (currentKey == '='){
             // if user pressed the equals sign, we should check if we have an operator set...
-            if (operation != ''){
+            if (operation != '' && num2 != ''){
                 history.innerText = `${num1} ${operation} ${num2} =`;
                 num1 = calculate(operation, num1, num2);
                 input.innerText = num1;
@@ -123,19 +123,18 @@ function keypadListeners(){
                 history.innerText = `${num1} =`;
             }
         }
+        function clearDisplay(amount){
+            input.innerText = '0';
+            newNum = true;
+            if (amount == 'all'){
+                history.innerText = '';
+                num1 = '';
+                num2 = '';
+            }
+        }
 
         // For when the clear button is pressed
         if (currentKey == 'c' || currentKey == 'ce'){
-            function clearDisplay(amount){
-                input.innerText = '0';
-                newNum = true;
-                if (amount == 'all'){
-                    history.innerText = '';
-                    num1 = '';
-                    num2 = '';
-                }
-            }
-
             if (currentKey == 'c'){
                 clearDisplay('all');
             } else {
@@ -147,29 +146,41 @@ function keypadListeners(){
         // when the backspace button is pressed
         if (currentKey == 'backspace'){
             let newInput = ``;
-            if (isNaN(lastKey) && lastKey != 'backspace'){
-                // if the last input wasn't a number, we simply clear history but leave the input
-                history.innerText = '';
-                num1 = '';
-                num2 = '';
-                newNum = true;
+            if (lastKey == '='){
+                // if the last input was =, then clear everything and set input to 0.
+
             } else {
-                // otherwise, backspace the last number inputted
-                if (input.innerText.length == 1){
-                    newInput = '0';
+                if (isNaN(lastKey) && lastKey != 'backspace'){
+                    // if the last input wasn't a number, we simply clear history but leave the input
+                    history.innerText = '';
+                    num1 = '';
+                    num2 = '';
+                    newNum = true;
                 } else {
-                    for (i = 0; i < input.innerText.length -1; i++){
-                        newInput += input.innerText[i];
+                    // otherwise, backspace the last number inputted
+                    if (input.innerText.length == 1){
+                        newInput = '0';
+                    } else {
+                        for (i = 0; i < input.innerText.length -1; i++){
+                            newInput += input.innerText[i];
+                        }
                     }
+                    input.innerText = newInput;
+                    newNum = true;
                 }
-                input.innerText = newInput;
-                newNum = true;
             }
         }
 
         // when . is pressed
         if (currentKey == '.'){
-            if (input.innerText.includes('.')){
+            console.log(lastKey)
+            if (lastKey == '='){
+                // if enter was the last one pressed, set to 0
+                input.innerText = '0.';
+                num1 = '';
+                num2 = '';
+                newNum = false;
+            } else if (input.innerText.includes('.') == true){
                 // there is a decimal already, so skip
             } else {
                 // otherwise, add a decimal
@@ -186,7 +197,7 @@ function keypadListeners(){
                 // num1 isn't set
                 num1 = input.innerText;
                 newNum = true;
-            } else if (num2 == ''){
+            } else if (num2 == '' && lastKey != '='){
                 // num1 is set, but num2 isn't
                 num2 = input.innerText;
                 newNum = true;
@@ -195,13 +206,10 @@ function keypadListeners(){
             // if equals wasn't pressed, set the operator
             if (operator.dataset.button != '='){
                 operation = operator.dataset.button;
-                updateDisplay(); 
             }
             
             // if both nums are set, calculate & update as needed
-            if (num1 != '' && num2 != ''){
-                updateDisplay();  
-            }
+            updateDisplay(); 
         });
     }));
 
@@ -232,6 +240,13 @@ function calculate(operator, firstNumber, secondNumber){
         total = var1 / var2;
     }else {
         console.log('invalid operator');
+    }
+
+    if (Number.isInteger(total) == false){
+        // if we're dealing with a float, limit the decimals
+        total = total.toFixed(2);
+
+        // to-do: have the decimal amount fill the available space without adding extra 0s....
     }
 
     // return the total
