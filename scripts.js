@@ -147,15 +147,16 @@ function keypadListeners(){
         if (currentKey == 'backspace'){
             let newInput = ``;
             if (lastKey == '='){
-                // if the last input was =, then clear everything and set input to 0.
-
+                // if the last input was =, then clear the history and the inputs
+                history.innerText = '';
+                num1 = input.innerText;
+                num2 = "";
+                newNum = true;
+                currentKey = lastKey;
             } else {
                 if (isNaN(lastKey) && lastKey != 'backspace'){
-                    // if the last input wasn't a number, we simply clear history but leave the input
-                    history.innerText = '';
-                    num1 = '';
-                    num2 = '';
-                    newNum = true;
+                    // if the last input wasn't a number, don't do anything
+                    currentKey = lastKey;
                 } else {
                     // otherwise, backspace the last number inputted
                     if (input.innerText.length == 1){
