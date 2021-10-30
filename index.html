@@ -9,32 +9,57 @@
 </head>
 <body> 
     <div class="container">
-        <div id="display"></div>
+        <div id="display">
+            <div id="top-bar">
+                <div>Calculator</div>
+                <div>
+                    <span class="gray-hover square">-</span>
+                    <span class="gray-hover square">□</span>
+                    <span class="red-hover square">X</span>
+                </div>
+            </div>
+            <div id="second-bar">
+                <div>
+                    <span class="large-font">☰</span>
+                    <span>Standard</span>
+                    <span class="large-font">⎗</span>
+                </div>
+                <div class="large-font">⟲</div>
+            </div>
+        </div>
         <div id="controls">
-            <div>%</div>
-            <div>CE</div>
-            <div>C</div>
-            <div>⌫</div>
-            <div>1/x</div>
-            <div>x2</div>
-            <div>2/x</div>
-            <div>/</div>
-            <div>7</div>
-            <div>8</div>
-            <div>9</div>
-            <div>X</div>
-            <div>4</div>
-            <div>5</div>
-            <div>6</div>
-            <div>-</div>
-            <div>1</div>
-            <div>2</div>
-            <div>3</div>
-            <div>+</div>
-            <div>+/-</div>
-            <div>0</div>
-            <div>.</div>
-            <div>=</div>
+            <ul id="c1" class="column">
+                <li class="light-gray-bg">%</li>
+                <li class="light-gray-bg group-character"><span>1</span><span>/</span><span>x</span></li>
+                <li>7</li>
+                <li>4</li>
+                <li>1</li>
+                <li class="group-character"><span>+</span><span>/</span><span>-</span></li>
+            </ul>
+            <ul id="c2" class="column">
+                <li class="light-gray-bg">CE</li>
+                <li class="light-gray-bg">x²</li>
+                <li>8</li>
+                <li>5</li>
+                <li>2</li>
+                <li>0</li>
+            </ul>
+            <ul id="c3" class="column">
+                <li class="light-gray-bg">C</li>
+                <li class="light-gray-bg group-character"><span>2</span><span>√</span><span>x</span></li>
+                <li>9</li>
+                <li>6</li>
+                <li>3</li>
+                <li>.</li>
+            </ul>
+            <ul id="c4" class="column">
+                <li class="light-gray-bg">⌫</li>
+                <li class="light-gray-bg">÷</li>
+                <li class="light-gray-bg">X</li>
+                <li class="light-gray-bg">-</li>
+                <li class="light-gray-bg">+</li>
+                <li class="bluish-bg">=</li>
+            </ul>
         </div>
     </div>
     
