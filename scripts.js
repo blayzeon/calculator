@@ -1,6 +1,4 @@
-/* START - CALCULATOR CONTROLS */
-
-// adds event listeners to the main keypads so that the buttons work
+// Event listeners & display changes
 function keypadListeners(){
     // calculator keypad & equation display
     const nums = document.querySelectorAll('.num');
@@ -40,6 +38,9 @@ function keypadListeners(){
             // Add whatever numbers are pressed to the display
             if (newNum === true){
                 // ensures that we start fresh when needed
+                if (num1 == '' && num2 == ''){
+                    history.innerText = '';
+                }
                 input.innerText = num.dataset.button;
                 newNum = false;
             } else if (characterCount < maxChar){
@@ -75,6 +76,7 @@ function keypadListeners(){
 
     */
     
+    // updates the display and saved numbers depending on user input
     function updateDisplay(){
         // if % is pressed, turn the second number into a percentage, or zero out the first one
         if (currentKey == '%'){
@@ -118,13 +120,20 @@ function keypadListeners(){
                 history.innerText = `${num1} ${operation} ${num2} =`;
                 num1 = calculate(operation, num1, num2);
                 input.innerText = num1;
+
+                // once we do the maths, we should then clear everything
+                num1 = '';
+                num2 = '';
             } else {
                 // otherwise we can just update the display
                 history.innerText = `${num1} =`;
             }
         }
+
+        // function to clear the display & user inputs
         function clearDisplay(amount){
             input.innerText = '0';
+            input.setAttribute('style', 'font-size: 3rem');
             newNum = true;
             if (amount == 'all'){
                 history.innerText = '';
@@ -133,7 +142,7 @@ function keypadListeners(){
             }
         }
 
-        // For when the clear button is pressed
+        // When one of the clear buttons is pressed, clear the display/inputs appropriately
         if (currentKey == 'c' || currentKey == 'ce'){
             if (currentKey == 'c'){
                 clearDisplay('all');
@@ -143,7 +152,7 @@ function keypadListeners(){
             
         }
 
-        // when the backspace button is pressed
+        // When the backspace button is pressed, erase the last character
         if (currentKey == 'backspace'){
             let newInput = ``;
             if (lastKey == '='){
@@ -172,7 +181,7 @@ function keypadListeners(){
             }
         }
 
-        // when . is pressed
+        // when . is pressed, add a decimal to the number
         if (currentKey == '.'){
             console.log(lastKey)
             if (lastKey == '='){
@@ -188,6 +197,56 @@ function keypadListeners(){
                 input.innerText += '.';
             }
         }
+
+        // When the +/- button is pressed, change whether or not the number is positive or negative
+        if (currentKey == '+/-'){
+            // temporary values
+            let flipMe = input.innerText;
+    
+            // apply the change
+            flipMe = flipMe - flipMe - flipMe;
+            input.innerText = flipMe;
+        }
+
+        // When the square root button is pressed, multiply the number by itself and update the input/history
+        if (currentKey == 'root'){
+            let temp = input.innerText;
+            let tempHistory = document.getElementById('equation-display').innerText;
+        
+            // set the nums if needed
+            if (num1 == ''){
+                num1 = temp;
+            }
+            if (num2 == ''){
+                num2 = temp;
+            }
+
+            if (tempHistory == ''){
+                // set the initial history if needed
+                tempHistory = temp;
+            } else {
+                // otherwise, add recursion
+                tempHistory = `sqr(${tempHistory})`;
+                
+                // clean it up
+                tempHistory = tempHistory.replace(' ', '');
+                tempHistory = tempHistory.replace('*', '');
+                tempHistory = tempHistory.replace('-', '');
+                tempHistory = tempHistory.replace('+', '');
+                tempHistory = tempHistory.replace('/', '');
+            }
+               
+            
+            if (operation != ''){
+                // if we have an operation set, apply it 
+                tempHistory = `${num1} ${operation} ${tempHistory}`;
+            }
+
+            // update the history
+            history.innerHTML = tempHistory;
+
+            input.innerText = calculate("*", temp, temp);
+        }
     }
 
     // operator event listners
@@ -198,6 +257,7 @@ function keypadListeners(){
                 // num1 isn't set
                 num1 = input.innerText;
                 newNum = true;
+
             } else if (num2 == '' && lastKey != '='){
                 // num1 is set, but num2 isn't
                 num2 = input.innerText;
@@ -206,6 +266,10 @@ function keypadListeners(){
 
             // if equals wasn't pressed, set the operator
             if (operator.dataset.button != '='){
+                if (num1 != '' && num2 != ''){
+                    // but if both numbers are set, we should apply the equation first
+                    updateDisplay();
+                }
                 operation = operator.dataset.button;
             }
             
@@ -220,14 +284,18 @@ function keypadListeners(){
     document.querySelector('#percent').addEventListener('click', updateDisplay);
     document.querySelector('#backspace').addEventListener('click', updateDisplay);
     document.querySelector('#decimal').addEventListener('click', updateDisplay);
+    document.querySelector('#flipper').addEventListener('click', updateDisplay);
+    document.querySelector('#root').addEventListener('click', updateDisplay);
 }
 
-/* END - CALCULATOR CONTROLS */
-
-/* START - CALCULATOR CALCULATIONS */
-function calculate(operator, firstNumber, secondNumber){
+// Math functions
+function calculate(operator, firstNumber, secondNumber="n/a"){
     let var1 = parseFloat(firstNumber);
-    let var2 = parseFloat(secondNumber);
+    let var2 = 0;
+
+    if (secondNumber != "n/a"){
+        var2 = parseFloat(secondNumber);
+    }
     
     let total = 0;
 
@@ -239,7 +307,7 @@ function calculate(operator, firstNumber, secondNumber){
         total = var1 * var2;
     } else if (operator === "/"){
         total = var1 / var2;
-    }else {
+    } else {
         console.log('invalid operator');
     }
 
@@ -254,11 +322,5 @@ function calculate(operator, firstNumber, secondNumber){
     return total;
 };
 
-/* END -  CALCULATOR CALCULATIONS */
-
-/* START - EVENT LISTENERS */
-
-// allows the keypad to work as expected
+// Required for the Javascript to run
 keypadListeners();
-
-/* END - EVENT LISTENERS */
