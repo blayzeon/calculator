@@ -210,8 +210,10 @@ function keypadListeners(){
 
         // When the square root button is pressed, multiply the number by itself and update the input/history
         if (currentKey == 'root'){
+            // to-do: fix it so the characters size down as more are added
+            
             let temp = input.innerText;
-            let tempHistory = document.getElementById('equation-display').innerText;
+            let tempHistory = history.innerText;
         
             // set the nums if needed
             if (num1 == ''){
@@ -223,9 +225,10 @@ function keypadListeners(){
 
             if (tempHistory == ''){
                 // set the initial history if needed
-                tempHistory = temp;
+                tempHistory = `sqr(${temp})`;
             } else {
                 // otherwise, add recursion
+                console.log('recursion');
                 tempHistory = `sqr(${tempHistory})`;
                 
                 // clean it up
@@ -234,6 +237,10 @@ function keypadListeners(){
                 tempHistory = tempHistory.replace('-', '');
                 tempHistory = tempHistory.replace('+', '');
                 tempHistory = tempHistory.replace('/', '');
+
+                for (i = 0; i < 10; i++){
+                    tempHistory = tempHistory.replace(`${i} `, '');
+                }
             }
                
             
