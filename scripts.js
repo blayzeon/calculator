@@ -24,6 +24,20 @@ function keypadListeners(){
     let currentKey = '';
     let lastKey = '';
     let prevOperation = ``;
+    const maxChar = 16;
+
+    // updates the font size deppending on how many characters are in the display
+    function updateFontSize(charCount){
+        if (charCount < 11){
+            input.setAttribute('style', 'font-size: 3rem');
+        } else if (charCount < 13){
+            input.setAttribute('style', 'font-size: 2.5rem');
+        } else if (charCount <= maxChar){
+            input.setAttribute('style', 'font-size: 2rem');
+        } else {
+            input.setAttribute('style', 'font-size: 1.5rem');
+        }
+    }
 
     // keeps track of the last button pressed
     allButtons.forEach((button =>{
@@ -35,9 +49,14 @@ function keypadListeners(){
 
     // display event listeners 
     nums.forEach((num =>{
-        const maxChar = 16;
         num.addEventListener('click', ()=>{
             let characterCount = input.innerText.length;
+
+            if (lastKey == "="){
+                // if the last key was enter, we need to clear num1 and num2
+                num1 = '';
+                num2 = '';
+            }
 
             // Add whatever numbers are pressed to the display
             if (newNum === true){
@@ -53,15 +72,7 @@ function keypadListeners(){
             }
 
             // changes the font size for the display depending on the number of characters
-            if (characterCount < 11){
-                input.setAttribute('style', 'font-size: 3rem');
-            } else if (characterCount < 13){
-                input.setAttribute('style', 'font-size: 2.5rem');
-            } else if (characterCount <= maxChar){
-                input.setAttribute('style', 'font-size: 2rem');
-            } else {
-                input.setAttribute('style', 'font-size: 1.5rem');
-            }
+            updateFontSize(characterCount);
         });
     }));
 
@@ -86,12 +97,32 @@ function keypadListeners(){
         function updateHistory(secondNum=num2){
             if (historyLog.length >= 19){
                 // remove the first item if the array gets too big
-                historyLog.shift()
+                historyLog.pop()
             } else {
-                historyLog.push({q: `${num1} ${operation} ${secondNum} =`, a: calculate(operation, num1, num2)});
+                historyLog.unshift({q: `${num1} ${operation} ${secondNum} =`, a: calculate(operation, num1, num2)});
             }
 
-            console.log(historyLog);
+            // show/hide the window
+            let hDump = document.getElementById('history-dump');
+
+            // show/hide the trashcan depending on if there's stuff
+            let emptyMsg = `There's no history yet`;
+            let tElm = document.getElementById('delete-history');
+            if (historyLog.length == 0){
+                // it's empty, so we want to hide the trash icon
+                tElm.style.visibility = "hidden";
+                hDump.innerHTML = emptyMsg;
+            } else {
+                // if it's not empty, show the trash
+                tElm.style.visibility = "visible";
+                // populate the history window
+                let hTemp = ``;
+                
+                for (i = 0; i < historyLog.length; i++){
+                    hTemp += `<div class="history-item"><span>${historyLog[i].q}</span><span>${historyLog[i].a}</span></div>`;
+                }
+                hDump.innerHTML = hTemp;
+            }
         }
 
         // if % is pressed, turn the second number into a percentage, or zero out the first one
@@ -121,20 +152,20 @@ function keypadListeners(){
             // update last history
             if (currentKey != '='){
                 history.innerText = `${num1} ${operation}`;
-                console.log('!=')
             } else {
                 history.innerText = `${num1} ${operation} ${num2} =`;
             }
 
             // do the calculation
             num1 = calculate(operation, num1, num2);
+            updateFontSize(num1.toString().length); // update font size before the value to avoid resizing
             input.innerText = num1;
         }
 
         // For when -+/* or = is pressed 
         if (operatorList.includes(currentKey)){
             // if the user pressed an operator or equals last time, do nothing ...
-            if (operatorList.includes(lastKey) || lastKey == '='){
+            if (operatorList.includes(lastKey)){
                 history.innerText = `${num1} ${operation}`;
                 return
             } else if (lastKey == "root" || lastKey == "sqr" || lastKey == "reciprocal"){
@@ -227,7 +258,6 @@ function keypadListeners(){
 
         // when . is pressed, add a decimal to the number
         if (currentKey == '.'){
-            console.log(lastKey)
             if (lastKey == '='){
                 // if enter was the last one pressed, set to 0
                 input.innerText = '0.';
@@ -263,6 +293,8 @@ function keypadListeners(){
             let temp = input.innerText;
             let tempHistory = history.innerText;
             let tag = `sqr`;
+            let result = ``;
+
             if (currentKey == 'reciprocal'){
                 tag = `1/`;
             } else if (currentKey == 'root'){
@@ -311,13 +343,16 @@ function keypadListeners(){
 
             if (currentKey == "sqr"){
                 // apply square sqr
-                input.innerText = calculate("*", temp, temp);
+                result = calculate("*", temp, temp);
             } else if (currentKey == "reciprocal"){
                 // apply reciprocal
-                input.innerText = calculate("/", 1, temp);
+                result.innerText = calculate("/", 1, temp);
             } else if (currentKey == "root"){
-                input.innerText = Math.sqrt(temp);
+                result.innerText = Math.sqrt(temp);
             }
+
+            updateFontSize(result.toString().length);
+            input.innerText = result;
         }
     }
 
@@ -360,36 +395,34 @@ function keypadListeners(){
     document.querySelector('#sqr').addEventListener('click', updateDisplay);
     document.querySelector('#reciprocal').addEventListener('click', updateDisplay);
     document.querySelector('#root').addEventListener('click', updateDisplay);
+    document.querySelector('#desktop-icon').addEventListener('click', ()=>{
+        document.getElementById('calculator').style.visibility = "visible";
+    });
+    document.querySelector('#resize-calculator').addEventListener('click',()=>{
+        document.getElementById('calculator').classList.toggle('big-boye');
+        document.querySelector('body').classList.toggle('light-gray-bg');
+        document.querySelector('#history-split').classList.toggle('split');
+    });
     document.querySelector('#view-history').addEventListener('click', ()=>{
         // show/hide the window
         let hElm = document.getElementById('history-window');
-        let hDump = document.getElementById('history-dump');
         hElm.classList.toggle('display-none');
-
-        // show/hide the trashcan depending on if there's stuff
-        let emptyMsg = `There's no history yet`;
-        let tElm = document.getElementById('delete-history');
-        if (historyLog.length == 0){
-            // it's empty, so we want to hide the trash icon
-            tElm.style.visibility = "hidden";
-            hDump.innerHTML = emptyMsg;
-            console.log(emptyMsg);
-        } else {
-            // if it's not empty, show the trash
-            tElm.style.visibility = "visible";
-            // populate the history window
-            let hTemp = ``;
-            
-            for (i = 0; i < historyLog.length; i++){
-                hTemp += `<div class="history-item"><span>${historyLog[i].q}</span><span>${historyLog[i].a}</span></div>`;
-            }
-            hDump.innerHTML = hTemp;
-        }
     });
 
     document.querySelector('#delete-history').addEventListener('click', ()=>{
         historyLog = [];
         document.getElementById('history-dump').innerHTML = `There's no history yet`;
+    });
+
+    document.querySelectorAll('.hide-calculator').forEach((hideBtn) =>{
+        hideBtn.addEventListener('click', ()=>{
+            document.getElementById('calculator').style.visibility = "hidden";
+            if (hideBtn.id == "window-close"){
+                currentKey = "c";
+                updateDisplay();
+                historyLog = [];
+            }
+        });
     });
 }
 
@@ -417,10 +450,11 @@ function calculate(operator, firstNumber, secondNumber="n/a"){
     }
 
     if (Number.isInteger(total) == false){
-        // if we're dealing with a float, limit the decimals
-        total = total.toFixed(2);
+        // if we're dealing with a float, limit the decimals to 15
+        total = parseFloat(total.toFixed(15));
 
-        // to-do: have the decimal amount fill the available space without adding extra 0s....
+        // get rid of the extra 0s
+
     }
 
     // return the total

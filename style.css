@@ -4,6 +4,13 @@
   box-sizing: border-box;
 }
 
+*{
+  transition: none !important;
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+}
+
 body{
   margin: 0;
   padding: 0;
@@ -27,10 +34,11 @@ START - FLEX / CONTAINERS */
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: 5%;
 }
 
 #calculator{
+  z-index: 1;
+  margin-top: 2rem;
   min-width: 20rem;
 }
 
@@ -54,22 +62,33 @@ START - FLEX / CONTAINERS */
 }
 
 #main-display{
+  display: flex;
+  flex-direction: column;
+  align-items:end;
+  width: 100%;
   padding: 0.5rem 0.2rem 2rem 0.2rem;
   text-align: right;
 }
 
+
 #history-display{
   margin-bottom: 0.3rem;
-  min-height: 1.6rem;
+  max-width: 290px;
+  min-height: 1.7rem;
+  white-space: nowrap;
+  overflow: hidden !important;
 }
 
 #equation-display{
+  display: flex;
+  align-items: center;
   font-size: 3rem;
-  max-width: 19rem;
+  min-height: 80px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   user-select: text;
+  max-width: 100%;
 }
 
 #third-bar{
@@ -188,6 +207,8 @@ START - COLORING / STYLING */
   font-weight: normal;
   text-align: left;
   padding: 0.5rem;
+  max-height: 23rem;
+  overflow: auto;
 }
 
 .history-item{
@@ -206,6 +227,40 @@ START - COLORING / STYLING */
 .history-item span:nth-child(2){
   color: white;
   font-size: larger;
+}
+
+#desktop-icon{
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 5rem;
+  margin: 1rem;
+  padding: 0 1.2rem;
+}
+
+#desktop-icon:hover{
+  outline-style: solid;
+  outline-width: 1px;
+  outline-color: hsla(10, 50%, 50%, 0.3);
+  background: hsla(10, 50%, 50%, 0.1);
+}
+
+.big-boye{
+  margin-top: 0rem !important;
+  width: 100%;
+  height: 100%;
+}
+
+.split{
+  display: flex;
+  flex-direction: column;
+}
+
+.split #history-window{
+  order: 2;
+  position: relative !important;
+  width: 100%;
+  height: 16.5rem;
 }
 
 
