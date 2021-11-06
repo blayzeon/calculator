@@ -47,10 +47,8 @@ function keypadListeners(){
         });
     }));
 
-    // display event listeners 
-    nums.forEach((num =>{
-        num.addEventListener('click', ()=>{
-            let characterCount = input.innerText.length;
+    function inputNum(num){
+        let characterCount = input.innerText.length;
 
             if (lastKey == "="){
                 // if the last key was enter, we need to clear num1 and num2
@@ -64,15 +62,133 @@ function keypadListeners(){
                 if (num1 == '' && num2 == ''){
                     history.innerText = '';
                 }
-                input.innerText = num.dataset.button;
+                input.innerText = num;
                 newNum = false;
             } else if (characterCount < maxChar){
                 // ensures that we don't end up with a huge amount of numbers
-                input.innerText += num.dataset.button;
+                input.innerText += num;
             }
 
             // changes the font size for the display depending on the number of characters
             updateFontSize(characterCount);
+    }
+
+    function inputOperator(operator){
+        if (operator != ""){
+            // checks what numbers we have set
+            if (num1 == ''){
+                // num1 isn't set
+                num1 = input.innerText;
+                newNum = true;
+
+            } else if (num2 == '' && lastKey != '='){
+                // num1 is set, but num2 isn't, so we should accept a new number
+                if (lastKey == 'root' || lastKey == 'sqr' || lastKey == 'reciprocal'){
+                    num1 = input.innerText;
+                    newNum = true;
+                } else {
+                    // if we're not using a special operator, we should also set num2
+                    num2 = input.innerText;
+                    newNum = true;
+                }
+                
+            }
+
+            // if equals wasn't pressed, set the operator
+            if (operator != '='){
+                if (num1 != '' && num2 != ''){
+                    // but if both numbers are set, we should apply the equation first
+                    updateDisplay();
+                }
+                operation = operator;
+            }
+            
+            // if both nums are set, calculate & update as needed
+            updateDisplay(); 
+        }
+    }
+
+    // keyboard support 
+    window.onkeydown = function(e){
+        lastKey = currentKey;
+
+        let keyCode = e.keyCode;
+        let keyNum = "";
+
+        
+
+        if (e.shiftKey == true){
+            if (keyCode == 56){
+                // multiplication
+                keyCode = 106;
+            } else if (keyCode == 43){
+                //addition
+                keyCode = 107;
+            } else if (keyCode == 53){
+                // %
+                keyCode = 37;
+            } else if (keyCode == 61){
+                // %
+                keyCode = 107;
+            } else {
+                return
+            }
+        }
+        
+        if (keyCode >= 48 && keyCode <= 57 || keyCode >= 96 && keyCode <= 105){
+            // numbers
+            if (keyCode < 57){
+                keyNum = keyCode - 48;
+            } else {
+                keyNum = keyCode - 96;
+            }
+            inputNum(keyNum);
+        } else {
+            if (keyCode == 191){
+                // division
+            } else if (keyCode == 106){
+                // multiplication
+                keyNum = "*";
+            } else if (keyCode == 61 || keyCode == 13){
+                // equals
+                keyNum = "=";
+            } else if (keyCode == 107){
+                // addition
+                keyNum = "+";
+            } else if (keyCode == 173 || keyCode == 109){
+                // subtraction
+                keyNum = "-";
+            } else if (keyCode == 8){
+                // backspace
+                keyNum = "backspace";
+            } else if (keyCode == 46){
+                // delete - clear the screen
+                keyNum = "c";
+            } else if (keyCode == 110 || keyCode == 190){
+                // . and . (period and num period)
+                keyNum = ".";
+            } else if (keyCode == 37){
+                keyNum = "%";
+            }else {
+                keyNum = "";
+            }
+
+            if (keyNum != ""){
+                currentKey = keyNum;
+
+                if (operatorList.includes(keyNum) || keyNum == "="){
+                    inputOperator(keyNum);
+                } else {
+                    updateDisplay()
+                }
+            }
+        }
+    };
+
+    // display event listeners 
+    nums.forEach((num =>{
+        num.addEventListener('click', ()=>{
+            inputNum(num.dataset.button);
         });
     }));
 
@@ -128,6 +244,7 @@ function keypadListeners(){
         // if % is pressed, turn the second number into a percentage, or zero out the first one
         if (currentKey == '%'){
             if (num1 == ''){
+                // if another number was never entered, we always return 0.
                 history.innerText = 0;
                 input.innerText = 0;
                 newNum = true;
@@ -164,8 +281,13 @@ function keypadListeners(){
 
         // For when -+/* or = is pressed 
         if (operatorList.includes(currentKey)){
-            // if the user pressed an operator or equals last time, do nothing ...
+            // if the user pressed an operator last time, just update the history
+            // but if they pressed equals, we need to update num1 and num2
             if (operatorList.includes(lastKey) || lastKey == "="){
+                if (lastKey == "="){
+                    num1 = input.innerText;
+                    num2 = "";
+                }
                 history.innerText = `${num1} ${operation}`;
                 return
             } else if (lastKey == "root" || lastKey == "sqr" || lastKey == "reciprocal"){
@@ -236,6 +358,11 @@ function keypadListeners(){
 
         // When the backspace button is pressed, erase the last character
         if (currentKey == 'backspace'){
+            if (lastKey == "."){
+                // we want to ignore . for backspacing purposes, so we're going to change it
+                lastKey = 'backspace';
+            }
+
             let newInput = ``;
             if (lastKey == '='){
                 // if the last input was =, then clear the history and the inputs
@@ -248,17 +375,20 @@ function keypadListeners(){
                 if (isNaN(lastKey) && lastKey != 'backspace'){
                     // if the last input wasn't a number, don't do anything
                     currentKey = lastKey;
+                    alert('ye');
                 } else {
                     // otherwise, backspace the last number inputted
                     if (input.innerText.length == 1){
                         newInput = '0';
+                        newNum = true;
+                        alert('good')
                     } else {
                         for (i = 0; i < input.innerText.length -1; i++){
                             newInput += input.innerText[i];
                         }
+                        newNum = false;
                     }
                     input.innerText = newInput;
-                    newNum = true;
                 }
             }
         }
@@ -273,6 +403,8 @@ function keypadListeners(){
                 newNum = false;
             } else if (input.innerText.includes('.') == true){
                 // there is a decimal already, so skip
+                lastKey == currentKey;
+                return;
             } else {
                 // otherwise, add a decimal
                 input.innerText += '.';
@@ -350,11 +482,11 @@ function keypadListeners(){
                 result = calculate("*", temp, temp);
             } else if (currentKey == "reciprocal"){
                 // apply reciprocal
-                result.innerText = calculate("/", 1, temp);
+                result = calculate("/", 1, temp);
             } else if (currentKey == "root"){
-                result.innerText = Math.sqrt(temp);
+                // apply square root
+                result = Math.sqrt(temp);
             }
-
             updateFontSize(result.toString().length);
             input.innerText = result;
         }
@@ -363,36 +495,7 @@ function keypadListeners(){
     // operator event listners
     operators.forEach((operator =>{
         operator.addEventListener('click', ()=>{
-            // checks what numbers we have set
-            if (num1 == ''){
-                // num1 isn't set
-                num1 = input.innerText;
-                newNum = true;
-
-            } else if (num2 == '' && lastKey != '='){
-                // num1 is set, but num2 isn't, so we should accept a new number
-                if (lastKey == 'root' || lastKey == 'sqr' || lastKey == 'reciprocal'){
-                    num1 = input.innerText;
-                    newNum = true;
-                } else {
-                    // if we're not using a special operator, we should also set num2
-                    num2 = input.innerText;
-                    newNum = true;
-                }
-                
-            }
-
-            // if equals wasn't pressed, set the operator
-            if (operator.dataset.button != '='){
-                if (num1 != '' && num2 != ''){
-                    // but if both numbers are set, we should apply the equation first
-                    updateDisplay();
-                }
-                operation = operator.dataset.button;
-            }
-            
-            // if both nums are set, calculate & update as needed
-            updateDisplay(); 
+            inputOperator(operator.dataset.button);
         });
     }));
 
