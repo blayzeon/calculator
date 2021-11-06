@@ -50,6 +50,13 @@ function keypadListeners(){
     function inputNum(num){
         let characterCount = input.innerText.length;
 
+            if (newNum == true && num == "0"){
+                // skip zero
+                input.innerText = num;
+                return
+            }
+
+
             if (lastKey == "="){
                 // if the last key was enter, we need to clear num1 and num2
                 num1 = '';
