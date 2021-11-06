@@ -389,13 +389,11 @@ function keypadListeners(){
                 if (isNaN(lastKey) && lastKey != 'backspace'){
                     // if the last input wasn't a number, don't do anything
                     currentKey = lastKey;
-                    alert('ye');
                 } else {
                     // otherwise, backspace the last number inputted
                     if (input.innerText.length == 1){
                         newInput = '0';
                         newNum = true;
-                        alert('good')
                     } else {
                         for (i = 0; i < input.innerText.length -1; i++){
                             newInput += input.innerText[i];
