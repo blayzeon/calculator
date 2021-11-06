@@ -412,7 +412,10 @@ function keypadListeners(){
                 // there is a decimal already, so skip
                 lastKey == currentKey;
                 return;
-            } else {
+            } else if (newNum == true){
+                input.innerText = '0.';
+                newNum = false;
+            }else {
                 // otherwise, add a decimal
                 input.innerText += '.';
             }
@@ -542,13 +545,13 @@ function keypadListeners(){
     });
     document.querySelector('#view-history').addEventListener('click', ()=>{
         // show/hide the window
-        let hElm = document.getElementById('history-window');
-        hElm.classList.toggle('display-none');
+        document.getElementById('history-window').classList.toggle('display-none');
     });
 
     document.querySelector('#delete-history').addEventListener('click', ()=>{
         historyLog = [];
         document.getElementById('history-dump').innerHTML = `There's no history yet`;
+        document.getElementById('delete-history').style.visibility = "hidden";
     });
 
     document.querySelectorAll('.hide-calculator').forEach((hideBtn) =>{
@@ -561,6 +564,7 @@ function keypadListeners(){
             toggleSize('off');
 
             if (hideBtn.id == "window-close"){
+                document.getElementById('history-window').classList.add('display-none');
                 currentKey = "c";
                 updateDisplay();
                 historyLog = [];

@@ -161,6 +161,10 @@ START - COLORING / STYLING */
   display: none;
 }
 
+.hidden{
+  visibility: hidden;
+}
+
 .column li{
   padding: 1.5rem 0.2rem;
   outline: 1px solid #333;
