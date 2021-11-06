@@ -165,18 +165,25 @@ function keypadListeners(){
         // For when -+/* or = is pressed 
         if (operatorList.includes(currentKey)){
             // if the user pressed an operator or equals last time, do nothing ...
-            if (operatorList.includes(lastKey)){
+            if (operatorList.includes(lastKey) || lastKey == "="){
                 history.innerText = `${num1} ${operation}`;
                 return
             } else if (lastKey == "root" || lastKey == "sqr" || lastKey == "reciprocal"){
-                // if the last key was a special operator, we should do the maths before continuing
-                operation = prevOperation;
-                num1 = calculate(operation, num1, num2);
-                updateHistory(history.innerText);
+                // if the last key was a special operator, we should check for num2
+                if (num2 != ""){
+                    // and apply it
+                    operation = prevOperation;
+                    num1 = calculate(operation, num1, num2);
+                    updateHistory(history.innerText);
 
-                // set things to what it should be now
-                operation = currentKey;
-                doMath();
+                    // set things to what it should be now
+                    operation = currentKey;
+                    doMath();
+                } else {
+                    // otherwise just update the history
+                    history.innerText = `${num1} ${operation}`;
+                    return
+                } 
             }else {
                 // ... otherwise, update the display history
                 history.innerText = `${num1} ${operation}`;
@@ -304,10 +311,7 @@ function keypadListeners(){
             // set the nums if needed
             if (num1 == '' || lastKey == '='){
                 num1 = temp;
-            }
-
-            if (num2 == '' || lastKey == '='){
-                num2 = temp;
+                num2 = "";
             }
 
             if (lastKey == '='){
@@ -366,9 +370,16 @@ function keypadListeners(){
                 newNum = true;
 
             } else if (num2 == '' && lastKey != '='){
-                // num1 is set, but num2 isn't
-                num2 = input.innerText;
-                newNum = true;
+                // num1 is set, but num2 isn't, so we should accept a new number
+                if (lastKey == 'root' || lastKey == 'sqr' || lastKey == 'reciprocal'){
+                    num1 = input.innerText;
+                    newNum = true;
+                } else {
+                    // if we're not using a special operator, we should also set num2
+                    num2 = input.innerText;
+                    newNum = true;
+                }
+                
             }
 
             // if equals wasn't pressed, set the operator
@@ -385,6 +396,18 @@ function keypadListeners(){
         });
     }));
 
+    function toggleSize(setting="default"){
+        if (setting == "default"){
+            document.getElementById('calculator').classList.toggle('big-boye');
+            document.querySelector('body').classList.toggle('light-gray-bg');
+            document.querySelector('#history-split').classList.toggle('split');
+        } else {
+            document.getElementById('calculator').classList.remove('big-boye');
+            document.querySelector('body').classList.remove('light-gray-bg');
+            document.querySelector('#history-split').classList.remove('split');
+        }
+    }
+
     // other event listeners 
     document.querySelector('#clear').addEventListener('click', updateDisplay);
     document.querySelector('#clear-entry').addEventListener('click', updateDisplay);
@@ -395,13 +418,17 @@ function keypadListeners(){
     document.querySelector('#sqr').addEventListener('click', updateDisplay);
     document.querySelector('#reciprocal').addEventListener('click', updateDisplay);
     document.querySelector('#root').addEventListener('click', updateDisplay);
-    document.querySelector('#desktop-icon').addEventListener('click', ()=>{
+    document.querySelector('#desktop-icon').addEventListener('dblclick', ()=>{
+        document.getElementById('container').classList.remove('absolute');
         document.getElementById('calculator').style.visibility = "visible";
     });
     document.querySelector('#resize-calculator').addEventListener('click',()=>{
-        document.getElementById('calculator').classList.toggle('big-boye');
-        document.querySelector('body').classList.toggle('light-gray-bg');
-        document.querySelector('#history-split').classList.toggle('split');
+        document.getElementById('container').classList.remove('absolute');
+        toggleSize();
+    });
+    document.querySelector('#calc-text').addEventListener('dblclick',()=>{
+        document.getElementById('container').classList.remove('absolute');
+        toggleSize();
     });
     document.querySelector('#view-history').addEventListener('click', ()=>{
         // show/hide the window
@@ -416,13 +443,55 @@ function keypadListeners(){
 
     document.querySelectorAll('.hide-calculator').forEach((hideBtn) =>{
         hideBtn.addEventListener('click', ()=>{
+            // hide the calc
+            document.getElementById('container').classList.remove('absolute');
             document.getElementById('calculator').style.visibility = "hidden";
+            
+            // revert the calc
+            toggleSize('off');
+
             if (hideBtn.id == "window-close"){
                 currentKey = "c";
                 updateDisplay();
                 historyLog = [];
             }
         });
+    });
+
+    // move the window around
+    let mouseDown = false;
+
+    function moveItem(id, offsetX="0", offsetY=""){
+        mouseDown = true;
+
+        let cWin = document.getElementById(id); //calculator window
+
+        // ensures the calculator is in the default state
+        document.getElementById('calculator').classList.remove('big-boye');
+        document.querySelector('body').classList.remove('light-gray-bg');
+        document.querySelector('#history-split').classList.remove('split');
+
+        onmousemove = function(e){
+            if (mouseDown == true){
+                cWin.classList.add('absolute');
+                cWin.style.left = `${e.clientX -offsetX}px`;
+                cWin.style.top = `${e.clientY-offsetY}px`;
+            } else {
+                //cWin.classList.remove('absolute');
+            }
+        }
+    }
+
+    document.getElementById('calc-text').addEventListener('mousedown', (e)=>{
+        moveItem('container', 110, 50);
+    });
+
+    document.getElementById('desktop-icon').addEventListener('mousedown', (e)=>{
+        moveItem('desktop-icon', 50, 50);
+    });
+
+    window.addEventListener('mouseup', ()=>{
+        mouseDown = false;
     });
 }
 
