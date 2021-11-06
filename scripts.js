@@ -97,8 +97,15 @@ function keypadListeners(){
             // if equals wasn't pressed, set the operator
             if (operator != '='){
                 if (num1 != '' && num2 != ''){
-                    // but if both numbers are set, we should apply the equation first
-                    updateDisplay();
+                    if (lastKey != "%"){
+                        // but if both numbers are set, we should apply the equation first
+                        updateDisplay();
+                    } else {
+                        updateDisplay();
+                        num1 = input.innerText;
+                        history.innerText = `${num1} ${operation}`;
+                        return;
+                    }
                 }
                 operation = operator;
             }
@@ -243,7 +250,7 @@ function keypadListeners(){
 
         // if % is pressed, turn the second number into a percentage, or zero out the first one
         if (currentKey == '%'){
-            if (num1 == ''){
+            if (history.innerText == ''){
                 // if another number was never entered, we always return 0.
                 history.innerText = 0;
                 input.innerText = 0;
