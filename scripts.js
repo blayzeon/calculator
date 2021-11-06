@@ -14,12 +14,16 @@ function keypadListeners(){
         '/',
         '*',
     ];
+
+    let historyLog = [];
+
     let num1 = '';
     let num2 = '';
     let operation = '';
     let newNum = true;
     let currentKey = '';
     let lastKey = '';
+    let prevOperation = ``;
 
     // keeps track of the last button pressed
     allButtons.forEach((button =>{
@@ -78,6 +82,18 @@ function keypadListeners(){
     
     // updates the display and saved numbers depending on user input
     function updateDisplay(){
+        // track and manage history
+        function updateHistory(secondNum=num2){
+            if (historyLog.length >= 19){
+                // remove the first item if the array gets too big
+                historyLog.shift()
+            } else {
+                historyLog.push({q: `${num1} ${operation} ${secondNum} =`, a: calculate(operation, num1, num2)});
+            }
+
+            console.log(historyLog);
+        }
+
         // if % is pressed, turn the second number into a percentage, or zero out the first one
         if (currentKey == '%'){
             if (num1 == ''){
@@ -98,18 +114,47 @@ function keypadListeners(){
             }
         }
 
+        function doMath(){
+            //add to history log
+            updateHistory();
+
+            // update last history
+            if (currentKey != '='){
+                history.innerText = `${num1} ${operation}`;
+                console.log('!=')
+            } else {
+                history.innerText = `${num1} ${operation} ${num2} =`;
+            }
+
+            // do the calculation
+            num1 = calculate(operation, num1, num2);
+            input.innerText = num1;
+        }
+
         // For when -+/* or = is pressed 
         if (operatorList.includes(currentKey)){
             // if the user pressed an operator or equals last time, do nothing ...
             if (operatorList.includes(lastKey) || lastKey == '='){
                 history.innerText = `${num1} ${operation}`;
                 return
-            } else {
-                // ... otherwise, apply the input
+            } else if (lastKey == "root" || lastKey == "sqr" || lastKey == "reciprocal"){
+                // if the last key was a special operator, we should do the maths before continuing
+                operation = prevOperation;
+                num1 = calculate(operation, num1, num2);
+                updateHistory(history.innerText);
+
+                // set things to what it should be now
+                operation = currentKey;
+                doMath();
+            }else {
+                // ... otherwise, update the display history
                 history.innerText = `${num1} ${operation}`;
+                
+                // and apply the input if we have both numbers
                 if (num2 != ''){
-                    num1 = calculate(operation, num1, num2);
-                    input.innerText = num1;
+                    doMath()
+
+                    // clear inputs
                     num2 = '';
                     newNum = true;
                 }
@@ -117,13 +162,11 @@ function keypadListeners(){
         } else if (currentKey == '='){
             // if user pressed the equals sign, we should check if we have an operator set...
             if (operation != '' && num2 != ''){
-                history.innerText = `${num1} ${operation} ${num2} =`;
-                num1 = calculate(operation, num1, num2);
-                input.innerText = num1;
+                // do the calculation
+                doMath()
 
-                // once we do the maths, we should then clear everything
+                // once we do the maths, we should then clear
                 num1 = '';
-                num2 = '';
             } else {
                 // otherwise we can just update the display
                 history.innerText = `${num1} =`;
@@ -139,6 +182,7 @@ function keypadListeners(){
                 history.innerText = '';
                 num1 = '';
                 num2 = '';
+                operation = '';
             }
         }
 
@@ -208,42 +252,55 @@ function keypadListeners(){
             input.innerText = flipMe;
         }
 
-        // When the square root button is pressed, multiply the number by itself and update the input/history
-        if (currentKey == 'root'){
+        // When the square (x2) button is pressed, multiply the number by itself and update the input/history
+        // when reciprocal (1/x) is pressed, divide by 1
+        if (currentKey == 'sqr' || currentKey == 'reciprocal' || currentKey == 'root'){
+            // set the operation to prevOperation
+            prevOperation = operation;
+
             // to-do: fix it so the characters size down as more are added
-            
+
             let temp = input.innerText;
             let tempHistory = history.innerText;
+            let tag = `sqr`;
+            if (currentKey == 'reciprocal'){
+                tag = `1/`;
+            } else if (currentKey == 'root'){
+                tag = "√";
+            }
         
             // set the nums if needed
-            if (num1 == ''){
+            if (num1 == '' || lastKey == '='){
                 num1 = temp;
             }
-            if (num2 == ''){
+
+            if (num2 == '' || lastKey == '='){
                 num2 = temp;
             }
 
-            if (tempHistory == ''){
+            if (lastKey == '='){
+                operation = '';
+            }
+            
+            if (tempHistory == '' || lastKey == '='){
                 // set the initial history if needed
-                tempHistory = `sqr(${temp})`;
+                tempHistory = `${tag}(${temp})`;
             } else {
                 // otherwise, add recursion
-                console.log('recursion');
-                tempHistory = `sqr(${tempHistory})`;
+                tempHistory = `${tag}(${tempHistory})`;
                 
                 // clean it up
-                tempHistory = tempHistory.replace(' ', '');
-                tempHistory = tempHistory.replace('*', '');
-                tempHistory = tempHistory.replace('-', '');
-                tempHistory = tempHistory.replace('+', '');
-                tempHistory = tempHistory.replace('/', '');
+                tempHistory = tempHistory.replace(' *', '');
+                tempHistory = tempHistory.replace(' -', '');
+                tempHistory = tempHistory.replace(' +', '');
+                tempHistory = tempHistory.replace(' /', '');
+                tempHistory = tempHistory.replace(' =', '');
 
                 for (i = 0; i < 10; i++){
                     tempHistory = tempHistory.replace(`${i} `, '');
                 }
             }
-               
-            
+
             if (operation != ''){
                 // if we have an operation set, apply it 
                 tempHistory = `${num1} ${operation} ${tempHistory}`;
@@ -252,7 +309,15 @@ function keypadListeners(){
             // update the history
             history.innerHTML = tempHistory;
 
-            input.innerText = calculate("*", temp, temp);
+            if (currentKey == "sqr"){
+                // apply square sqr
+                input.innerText = calculate("*", temp, temp);
+            } else if (currentKey == "reciprocal"){
+                // apply reciprocal
+                input.innerText = calculate("/", 1, temp);
+            } else if (currentKey == "root"){
+                input.innerText = Math.sqrt(temp);
+            }
         }
     }
 
@@ -292,7 +357,40 @@ function keypadListeners(){
     document.querySelector('#backspace').addEventListener('click', updateDisplay);
     document.querySelector('#decimal').addEventListener('click', updateDisplay);
     document.querySelector('#flipper').addEventListener('click', updateDisplay);
+    document.querySelector('#sqr').addEventListener('click', updateDisplay);
+    document.querySelector('#reciprocal').addEventListener('click', updateDisplay);
     document.querySelector('#root').addEventListener('click', updateDisplay);
+    document.querySelector('#view-history').addEventListener('click', ()=>{
+        // show/hide the window
+        let hElm = document.getElementById('history-window');
+        let hDump = document.getElementById('history-dump');
+        hElm.classList.toggle('display-none');
+
+        // show/hide the trashcan depending on if there's stuff
+        let emptyMsg = `There's no history yet`;
+        let tElm = document.getElementById('delete-history');
+        if (historyLog.length == 0){
+            // it's empty, so we want to hide the trash icon
+            tElm.style.visibility = "hidden";
+            hDump.innerHTML = emptyMsg;
+            console.log(emptyMsg);
+        } else {
+            // if it's not empty, show the trash
+            tElm.style.visibility = "visible";
+            // populate the history window
+            let hTemp = ``;
+            
+            for (i = 0; i < historyLog.length; i++){
+                hTemp += `<div class="history-item"><span>${historyLog[i].q}</span><span>${historyLog[i].a}</span></div>`;
+            }
+            hDump.innerHTML = hTemp;
+        }
+    });
+
+    document.querySelector('#delete-history').addEventListener('click', ()=>{
+        historyLog = [];
+        document.getElementById('history-dump').innerHTML = `There's no history yet`;
+    });
 }
 
 // Math functions
